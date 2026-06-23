@@ -7716,7 +7716,7 @@ class GameScene extends Phaser.Scene {
       _0x426993.setTexture("GJ_WebSheet", _0x23c9e5 ? 'toggleFullscreenOff_001.png' : "toggleFullscreenOn_001.png");
       this._toggleFullscreen();
     });
-    this._pauseContainer.add(this.add.bitmapText(_0x13af33, 0x41, 'bigFont', "Stereo Madness", 0x28).setOrigin(0.5, 0.5));
+    this._pauseContainer.add(this.add.bitmapText(_0x13af33, 0x41, 'bigFont', (this.game.registry.get("selectedLevelMeta")?.name || "Stereo Madness"), 0x28).setOrigin(0.5, 0.5));
     const _0x46bab2 = this._bestPercent || 0x0;
     const _0x38b8d1 = this.add.image(_0x13af33, 0xaa, 'GJ_WebSheet', "GJ_progressBar_001.png").setTint(0x0).setAlpha(0.49019607843137253);
     this._pauseContainer.add(_0x38b8d1);
