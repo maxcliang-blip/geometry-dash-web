@@ -251,9 +251,7 @@ class PreloadScene extends Phaser.Scene {
     this.game.registry.set("requestedLevelPath", _0x4d7bd3);
     this.load.text("level_selected", _0x4d7bd3);
     this.load.text("level_1", "assets/1.txt");
-    for (const _0x52f8cc of Object.values(LEVEL_META)) {
-      this.load.audio(_0x52f8cc.songKey, "assets/" + _0x52f8cc.songFile);
-    }
+    
     this.load.audio('explode_11', "assets/explode_11.ogg");
     this.load.audio('endStart_02', 'assets/endStart_02.ogg');
     this.load.audio("playSound_01", 'assets/playSound_01.ogg');
@@ -7275,16 +7273,6 @@ class ys {
     return "stereo_madness";
   }
   ["startMusic"]() {
-    if (this._music) {
-      this._music.stop();
-      this._music.destroy();
-    }
-    this._music = this._scene.sound.add(this._resolveSongKey(), {
-      loop: true,
-      volume: this._effectiveVolume()
-    });
-    this._music.play();
-    this._setupAnalyser();
   }
   ["stopMusic"]() {
     if (this._music) {
