@@ -129,43 +129,14 @@
       }
     }
   </style>
-  <script defer src="./vendor.js"></script>
-  <script defer src="./game.js"></script>
   <script>
-    function showBootError(message) {
-      var panel = document.createElement('pre');
-      panel.textContent = message;
-      panel.style.position = 'fixed';
-      panel.style.left = '12px';
-      panel.style.right = '12px';
-      panel.style.top = '12px';
-      panel.style.zIndex = '99999';
-      panel.style.padding = '10px 12px';
-      panel.style.background = 'rgba(0,0,0,0.85)';
-      panel.style.color = '#ff7878';
-      panel.style.border = '1px solid #ff4d4f';
-      panel.style.borderRadius = '8px';
-      panel.style.font = '12px/1.4 Consolas, monospace';
-      panel.style.whiteSpace = 'pre-wrap';
-      document.body.appendChild(panel);
-    }
-
-    window.addEventListener('error', function (event) {
-      showBootError('Runtime error: ' + (event.message || 'unknown'));
-    });
-
-    window.addEventListener('unhandledrejection', function (event) {
-      var reason = event && event.reason ? String(event.reason) : 'unknown';
-      showBootError('Unhandled rejection: ' + reason);
-    });
-
     var DIFFICULTIES = {
-      easy: { emoji: '\u{1F642}', label: 'Easy', color: '#4caf50' },
-      normal: { emoji: '\u{1F610}', label: 'Normal', color: '#8bc34a' },
-      hard: { emoji: '\u{1F928}', label: 'Hard', color: '#ff9800' },
-      harder: { emoji: '\u{1F620}', label: 'Harder', color: '#f44336' },
-      insane: { emoji: '\u{1F608}', label: 'Insane', color: '#9c27b0' },
-      demon: { emoji: '\u{1F480}', label: 'Demon', color: '#3f51b5' }
+      easy: { emoji: '\u{1F642}', label: 'Easy' },
+      normal: { emoji: '\u{1F610}', label: 'Normal' },
+      hard: { emoji: '\u{1F928}', label: 'Hard' },
+      harder: { emoji: '\u{1F620}', label: 'Harder' },
+      insane: { emoji: '\u{1F608}', label: 'Insane' },
+      demon: { emoji: '\u{1F480}', label: 'Demon' }
     };
 
     var LEVELS = [
@@ -193,102 +164,92 @@
       { id: 22, name: 'Dash', song: 'Dash.mp3', diff: 'normal' }
     ];
 
-    function selectedLevelMeta() {
-      var params = new URLSearchParams(window.location.search);
-      var level = parseInt(params.get('level') || '1', 10);
-      if (!Number.isFinite(level)) level = 1;
-      return LEVELS.find(function (entry) { return entry.id === level; }) || LEVELS[0];
+    function loadGameScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
     }
 
-    function updateTitleFromQuery() {
-      var meta = selectedLevelMeta();
-      document.title = 'Geometry Dash - ' + meta.name;
+    var _currentIndex = 0;
+
+    function renderLevel() {
+      var level = LEVELS[_currentIndex];
+      var diff = DIFFICULTIES[level.diff];
+      document.getElementById('gdLevelNum').textContent = 'Level ' + level.id;
+      document.getElementById('gdLevelName').textContent = level.name;
+      document.getElementById('gdLevelDiff').textContent = diff.emoji;
+      document.getElementById('gdLevelSong').textContent = level.song.replace('.mp3', '');
     }
 
-    function mountLevelSelector() {
-      var currentIndex = 0;
-      LEVELS.forEach(function (e, i) { if (e.id === selectedLevelMeta().id) currentIndex = i; });
+    function startGame() {
+      document.getElementById('gdPicker').style.display = 'none';
+      document.body.style.background = '#000';
+      loadGameScript('./vendor.js').then(function () {
+        return loadGameScript('./game.js');
+      }).catch(function () {
+        alert('Failed to load game scripts. Check network.');
+      });
+    }
 
-      var wrap = document.createElement('section');
-      wrap.className = 'level-picker';
-      wrap.innerHTML =
-        '<div class="title">Select Level</div>' +
-        '<div class="nav-row">' +
-          '<button class="arrow" id="gdArrowLeft">\u25C0</button>' +
-          '<div class="level-card">' +
-            '<div class="level-number" id="gdLevelNum"></div>' +
-            '<div class="level-name" id="gdLevelName"></div>' +
-            '<div class="level-difficulty" id="gdLevelDiff"></div>' +
-            '<div class="level-song" id="gdLevelSong"></div>' +
+    window.addEventListener('DOMContentLoaded', function () {
+      document.body.innerHTML =
+        '<div id="gdPicker" class="level-picker">' +
+          '<div class="title">Select Level</div>' +
+          '<div class="nav-row">' +
+            '<button class="arrow" id="gdArrowLeft">\u25C0</button>' +
+            '<div class="level-card">' +
+              '<div class="level-number" id="gdLevelNum"></div>' +
+              '<div class="level-name" id="gdLevelName"></div>' +
+              '<div class="level-difficulty" id="gdLevelDiff"></div>' +
+              '<div class="level-song" id="gdLevelSong"></div>' +
+            '</div>' +
+            '<button class="arrow" id="gdArrowRight">\u25B6</button>' +
           '</div>' +
-          '<button class="arrow" id="gdArrowRight">\u25B6</button>' +
-        '</div>' +
-        '<button class="play-btn" id="gdPlayBtn">Play</button>';
-      document.body.appendChild(wrap);
+          '<button class="play-btn" id="gdPlayBtn">Play</button>' +
+        '</div>';
 
-      function renderLevel(index) {
-        var level = LEVELS[index];
-        var diff = DIFFICULTIES[level.diff];
-        document.getElementById('gdLevelNum').textContent = 'Level ' + level.id;
-        document.getElementById('gdLevelName').textContent = level.name;
-        document.getElementById('gdLevelDiff').textContent = diff.emoji;
-        document.getElementById('gdLevelSong').textContent = level.song.replace('.mp3', '');
+      _currentIndex = 0;
+      var params = new URLSearchParams(window.location.search);
+      var levelParam = parseInt(params.get('level') || '1', 10);
+      if (Number.isFinite(levelParam)) {
+        LEVELS.forEach(function (e, i) { if (e.id === levelParam) _currentIndex = i; });
       }
 
-      function loadLevel(index) {
-        var params = new URLSearchParams(window.location.search);
-        params.set('level', LEVELS[index].id);
-        window.location.search = params.toString();
-      }
-
-      renderLevel(currentIndex);
+      renderLevel();
 
       document.getElementById('gdArrowLeft').addEventListener('click', function () {
-        currentIndex = (currentIndex - 1 + LEVELS.length) % LEVELS.length;
-        renderLevel(currentIndex);
+        _currentIndex = (_currentIndex - 1 + LEVELS.length) % LEVELS.length;
+        renderLevel();
       });
-
       document.getElementById('gdArrowRight').addEventListener('click', function () {
-        currentIndex = (currentIndex + 1) % LEVELS.length;
-        renderLevel(currentIndex);
+        _currentIndex = (_currentIndex + 1) % LEVELS.length;
+        renderLevel();
       });
-
       document.getElementById('gdPlayBtn').addEventListener('click', function () {
-        loadLevel(currentIndex);
+        var params = new URLSearchParams(window.location.search);
+        params.set('level', LEVELS[_currentIndex].id);
+        history.replaceState(null, '', '?' + params.toString());
+        document.title = 'Geometry Dash - ' + LEVELS[_currentIndex].name;
+        startGame();
       });
-
       document.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowLeft') {
-          currentIndex = (currentIndex - 1 + LEVELS.length) % LEVELS.length;
-          renderLevel(currentIndex);
+          _currentIndex = (_currentIndex - 1 + LEVELS.length) % LEVELS.length;
+          renderLevel();
           e.preventDefault();
         } else if (e.key === 'ArrowRight') {
-          currentIndex = (currentIndex + 1) % LEVELS.length;
-          renderLevel(currentIndex);
+          _currentIndex = (_currentIndex + 1) % LEVELS.length;
+          renderLevel();
           e.preventDefault();
         } else if (e.key === 'Enter') {
-          loadLevel(currentIndex);
+          document.getElementById('gdPlayBtn').click();
         }
       });
-    }
-
-    updateTitleFromQuery();
-
-    window.addEventListener('load', function () {
-      mountLevelSelector();
-      setTimeout(function () {
-        var hasCanvas = !!document.querySelector('canvas');
-        if (!hasCanvas) {
-          var hasPhaser = typeof window.Phaser !== 'undefined';
-          showBootError('Boot watchdog: no canvas created. Phaser loaded: ' + hasPhaser + '. Open DevTools Network and confirm reconstructed_vendor_bundle.js and reconstructed_game_logic.js return 200.');
-        }
-      }, 1200);
     });
-
-    // Keep resize behavior aligned with the original runner.
-    new ResizeObserver(() => {
-      window.dispatchEvent(new Event('resize'));
-    }).observe(document.documentElement);
   </script>
 </head>
 <body>
