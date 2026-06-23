@@ -20,133 +20,133 @@ const LEVEL_META = {
   0x1: {
     id: 0x1,
     name: "Stereo Madness",
-    songFile: "StereoMadness.mp3",
+    songFile: "silent.mp3",
     songKey: "stereo_madness"
   },
   0x2: {
     id: 0x2,
     name: "Back on Track",
-    songFile: "BackOnTrack.mp3",
+    songFile: "silent.mp3",
     songKey: "song_2"
   },
   0x3: {
     id: 0x3,
     name: "Polargeist",
-    songFile: "Polargeist.mp3",
+    songFile: "silent.mp3",
     songKey: "song_3"
   },
   0x4: {
     id: 0x4,
     name: "Dry Out",
-    songFile: "DryOut.mp3",
+    songFile: "silent.mp3",
     songKey: "song_4"
   },
   0x5: {
     id: 0x5,
     name: "Base After Base",
-    songFile: "BaseAfterBase.mp3",
+    songFile: "silent.mp3",
     songKey: "song_5"
   },
   0x6: {
     id: 0x6,
     name: "Can't Let Go",
-    songFile: "CantLetGo.mp3",
+    songFile: "silent.mp3",
     songKey: "song_6"
   },
   0x7: {
     id: 0x7,
     name: "Jumper",
-    songFile: "Jumper.mp3",
+    songFile: "silent.mp3",
     songKey: "song_7"
   },
   0x8: {
     id: 0x8,
     name: "Time Machine",
-    songFile: "TimeMachine.mp3",
+    songFile: "silent.mp3",
     songKey: "song_8"
   },
   0x9: {
     id: 0x9,
     name: "Cycles",
-    songFile: "Cycles.mp3",
+    songFile: "silent.mp3",
     songKey: "song_9"
   },
   0xa: {
     id: 0xa,
     name: "xStep",
-    songFile: "xStep.mp3",
+    songFile: "silent.mp3",
     songKey: "song_10"
   },
   0xb: {
     id: 0xb,
     name: "Clutterfunk",
-    songFile: "Clutterfunk.mp3",
+    songFile: "silent.mp3",
     songKey: "song_11"
   },
   0xc: {
     id: 0xc,
     name: "Theory of Everything",
-    songFile: "TheoryOfEverything.mp3",
+    songFile: "silent.mp3",
     songKey: "song_12"
   },
   0xd: {
     id: 0xd,
     name: "Electroman Adventures",
-    songFile: "Electroman.mp3",
+    songFile: "silent.mp3",
     songKey: "song_13"
   },
   0xe: {
     id: 0xe,
     name: "Clubstep",
-    songFile: "Clubstep.mp3",
+    songFile: "silent.mp3",
     songKey: "song_14"
   },
   0xf: {
     id: 0xf,
     name: "Electrodynamix",
-    songFile: "Electrodynamix.mp3",
+    songFile: "silent.mp3",
     songKey: "song_15"
   },
   0x10: {
     id: 0x10,
     name: "Hexagon Force",
-    songFile: "HexagonForce.mp3",
+    songFile: "silent.mp3",
     songKey: "song_16"
   },
   0x11: {
     id: 0x11,
     name: "Blast Processing",
-    songFile: "BlastProcessing.mp3",
+    songFile: "silent.mp3",
     songKey: "song_17"
   },
   0x12: {
     id: 0x12,
     name: "Theory of Everything 2",
-    songFile: "TheoryOfEverything2.mp3",
+    songFile: "silent.mp3",
     songKey: "song_18"
   },
   0x13: {
     id: 0x13,
     name: "Geometrical Dominator",
-    songFile: "GeometricalDominator.mp3",
+    songFile: "silent.mp3",
     songKey: "song_19"
   },
   0x14: {
     id: 0x14,
     name: "Deadlocked",
-    songFile: "Deadlocked.mp3",
+    songFile: "silent.mp3",
     songKey: "song_20"
   },
   0x15: {
     id: 0x15,
     name: "Fingerdash",
-    songFile: "Fingerdash.mp3",
+    songFile: "silent.mp3",
     songKey: "song_21"
   },
   0x16: {
     id: 0x16,
     name: "Dash",
-    songFile: "Dash.mp3",
+    songFile: "silent.mp3",
     songKey: "song_22"
   }
 };
