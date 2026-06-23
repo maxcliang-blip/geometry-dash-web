@@ -5,65 +5,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Geometry Dash</title>
   <style>
-    * { margin: 0; padding: 0; }
-    body { overflow: hidden; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #000; }
     canvas { display: block; margin: 0 auto; }
     .level-picker {
       position: fixed;
-      top: 14px;
-      right: 14px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 9998;
-      min-width: 300px;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: linear-gradient(135deg, rgba(18, 36, 56, 0.9), rgba(8, 14, 26, 0.9));
-      color: #e7f8ff;
-      font: 12px/1.4 Consolas, monospace;
-      backdrop-filter: blur(4px);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+      width: 420px;
+      padding: 20px;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(180deg, rgba(12, 25, 45, 0.95), rgba(4, 10, 22, 0.95));
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      user-select: none;
     }
-    .level-picker h2 {
-      font: 700 12px/1.2 Consolas, monospace;
-      letter-spacing: 0.04em;
-      margin-bottom: 8px;
-      color: #9de8ff;
+    .level-picker .title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8fe0ff;
+      margin-bottom: 16px;
     }
-    .level-picker .row {
+    .level-picker .nav-row {
       display: flex;
-      gap: 6px;
       align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .level-picker select,
-    .level-picker button {
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.35);
-      color: #e7f8ff;
-      padding: 6px 8px;
-      font: 12px/1.2 Consolas, monospace;
+    .level-picker .arrow {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
     }
-    .level-picker select {
+    .level-picker .arrow:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .level-picker .arrow:active {
+      transform: scale(0.92);
+    }
+    .level-picker .level-card {
       flex: 1;
+      padding: 14px 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       min-width: 0;
     }
-    .level-picker button {
-      cursor: pointer;
-      background: linear-gradient(180deg, #26b6d4, #1b7995);
-      color: #f4feff;
-      border-color: rgba(255, 255, 255, 0.3);
+    .level-picker .level-number {
+      font-size: 11px;
+      font-weight: 600;
+      color: #7ab8d4;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
     }
-    .level-picker .song {
+    .level-picker .level-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .level-picker .level-difficulty {
+      font-size: 28px;
       margin-top: 6px;
-      color: #8fe0ff;
-      opacity: 0.9;
+      line-height: 1;
     }
-    @media (max-width: 700px) {
+    .level-picker .level-song {
+      font-size: 11px;
+      color: #6a9bb5;
+      margin-top: 4px;
+    }
+    .level-picker .play-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #3ad, #1a7a9a);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .level-picker .play-btn:hover {
+      filter: brightness(1.15);
+    }
+    .level-picker .play-btn:active {
+      transform: scale(0.97);
+    }
+    @media (max-width: 500px) {
       .level-picker {
-        left: 10px;
-        right: 10px;
-        top: 10px;
-        min-width: 0;
+        width: calc(100% - 24px);
+        padding: 14px;
+      }
+      .level-picker .level-name {
+        font-size: 15px;
+      }
+      .level-picker .arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
       }
     }
   </style>
@@ -97,29 +159,38 @@
       showBootError('Unhandled rejection: ' + reason);
     });
 
+    var DIFFICULTIES = {
+      easy: { emoji: '\u{1F642}', label: 'Easy', color: '#4caf50' },
+      normal: { emoji: '\u{1F610}', label: 'Normal', color: '#8bc34a' },
+      hard: { emoji: '\u{1F928}', label: 'Hard', color: '#ff9800' },
+      harder: { emoji: '\u{1F620}', label: 'Harder', color: '#f44336' },
+      insane: { emoji: '\u{1F608}', label: 'Insane', color: '#9c27b0' },
+      demon: { emoji: '\u{1F480}', label: 'Demon', color: '#3f51b5' }
+    };
+
     var LEVELS = [
-      { id: 1, name: 'Stereo Madness', song: 'StereoMadness.mp3' },
-      { id: 2, name: 'Back on Track', song: 'BackOnTrack.mp3' },
-      { id: 3, name: 'Polargeist', song: 'Polargeist.mp3' },
-      { id: 4, name: 'Dry Out', song: 'DryOut.mp3' },
-      { id: 5, name: 'Base After Base', song: 'BaseAfterBase.mp3' },
-      { id: 6, name: "Can't Let Go", song: 'CantLetGo.mp3' },
-      { id: 7, name: 'Jumper', song: 'Jumper.mp3' },
-      { id: 8, name: 'Time Machine', song: 'TimeMachine.mp3' },
-      { id: 9, name: 'Cycles', song: 'Cycles.mp3' },
-      { id: 10, name: 'xStep', song: 'xStep.mp3' },
-      { id: 11, name: 'Clutterfunk', song: 'Clutterfunk.mp3' },
-      { id: 12, name: 'Theory of Everything', song: 'TheoryOfEverything.mp3' },
-      { id: 13, name: 'Electroman Adventures', song: 'Electroman.mp3' },
-      { id: 14, name: 'Clubstep', song: 'Clubstep.mp3' },
-      { id: 15, name: 'Electrodynamix', song: 'Electrodynamix.mp3' },
-      { id: 16, name: 'Hexagon Force', song: 'HexagonForce.mp3' },
-      { id: 17, name: 'Blast Processing', song: 'BlastProcessing.mp3' },
-      { id: 18, name: 'Theory of Everything 2', song: 'TheoryOfEverything2.mp3' },
-      { id: 19, name: 'Geometrical Dominator', song: 'GeometricalDominator.mp3' },
-      { id: 20, name: 'Deadlocked', song: 'Deadlocked.mp3' },
-      { id: 21, name: 'Fingerdash', song: 'Fingerdash.mp3' },
-      { id: 22, name: 'Dash', song: 'Dash.mp3' }
+      { id: 1, name: 'Stereo Madness', song: 'StereoMadness.mp3', diff: 'easy' },
+      { id: 2, name: 'Back on Track', song: 'BackOnTrack.mp3', diff: 'easy' },
+      { id: 3, name: 'Polargeist', song: 'Polargeist.mp3', diff: 'normal' },
+      { id: 4, name: 'Dry Out', song: 'DryOut.mp3', diff: 'normal' },
+      { id: 5, name: 'Base After Base', song: 'BaseAfterBase.mp3', diff: 'normal' },
+      { id: 6, name: "Can't Let Go", song: 'CantLetGo.mp3', diff: 'hard' },
+      { id: 7, name: 'Jumper', song: 'Jumper.mp3', diff: 'hard' },
+      { id: 8, name: 'Time Machine', song: 'TimeMachine.mp3', diff: 'hard' },
+      { id: 9, name: 'Cycles', song: 'Cycles.mp3', diff: 'harder' },
+      { id: 10, name: 'xStep', song: 'xStep.mp3', diff: 'harder' },
+      { id: 11, name: 'Clutterfunk', song: 'Clutterfunk.mp3', diff: 'harder' },
+      { id: 12, name: 'Theory of Everything', song: 'TheoryOfEverything.mp3', diff: 'insane' },
+      { id: 13, name: 'Electroman Adventures', song: 'Electroman.mp3', diff: 'insane' },
+      { id: 14, name: 'Clubstep', song: 'Clubstep.mp3', diff: 'demon' },
+      { id: 15, name: 'Electrodynamix', song: 'Electrodynamix.mp3', diff: 'insane' },
+      { id: 16, name: 'Hexagon Force', song: 'HexagonForce.mp3', diff: 'insane' },
+      { id: 17, name: 'Blast Processing', song: 'BlastProcessing.mp3', diff: 'hard' },
+      { id: 18, name: 'Theory of Everything 2', song: 'TheoryOfEverything2.mp3', diff: 'insane' },
+      { id: 19, name: 'Geometrical Dominator', song: 'GeometricalDominator.mp3', diff: 'harder' },
+      { id: 20, name: 'Deadlocked', song: 'Deadlocked.mp3', diff: 'demon' },
+      { id: 21, name: 'Fingerdash', song: 'Fingerdash.mp3', diff: 'harder' },
+      { id: 22, name: 'Dash', song: 'Dash.mp3', diff: 'normal' }
     ];
 
     function selectedLevelMeta() {
@@ -135,40 +206,69 @@
     }
 
     function mountLevelSelector() {
-      var meta = selectedLevelMeta();
+      var currentIndex = 0;
+      LEVELS.forEach(function (e, i) { if (e.id === selectedLevelMeta().id) currentIndex = i; });
+
       var wrap = document.createElement('section');
       wrap.className = 'level-picker';
       wrap.innerHTML =
-        '<h2>Level Selector</h2>' +
-        '<div class="row">' +
-          '<select id="gdLevelSelect"></select>' +
-          '<button id="gdLevelLoad" type="button">Load</button>' +
+        '<div class="title">Select Level</div>' +
+        '<div class="nav-row">' +
+          '<button class="arrow" id="gdArrowLeft">\u25C0</button>' +
+          '<div class="level-card">' +
+            '<div class="level-number" id="gdLevelNum"></div>' +
+            '<div class="level-name" id="gdLevelName"></div>' +
+            '<div class="level-difficulty" id="gdLevelDiff"></div>' +
+            '<div class="level-song" id="gdLevelSong"></div>' +
+          '</div>' +
+          '<button class="arrow" id="gdArrowRight">\u25B6</button>' +
         '</div>' +
-        '<div class="song" id="gdSongInfo"></div>';
+        '<button class="play-btn" id="gdPlayBtn">Play</button>';
       document.body.appendChild(wrap);
 
-      var select = document.getElementById('gdLevelSelect');
-      var songInfo = document.getElementById('gdSongInfo');
-      LEVELS.forEach(function (entry) {
-        var option = document.createElement('option');
-        option.value = String(entry.id);
-        option.textContent = entry.id + '. ' + entry.name;
-        if (entry.id === meta.id) option.selected = true;
-        select.appendChild(option);
+      function renderLevel(index) {
+        var level = LEVELS[index];
+        var diff = DIFFICULTIES[level.diff];
+        document.getElementById('gdLevelNum').textContent = 'Level ' + level.id;
+        document.getElementById('gdLevelName').textContent = level.name;
+        document.getElementById('gdLevelDiff').textContent = diff.emoji;
+        document.getElementById('gdLevelSong').textContent = level.song.replace('.mp3', '');
+      }
+
+      function loadLevel(index) {
+        var params = new URLSearchParams(window.location.search);
+        params.set('level', LEVELS[index].id);
+        window.location.search = params.toString();
+      }
+
+      renderLevel(currentIndex);
+
+      document.getElementById('gdArrowLeft').addEventListener('click', function () {
+        currentIndex = (currentIndex - 1 + LEVELS.length) % LEVELS.length;
+        renderLevel(currentIndex);
       });
 
-      function refreshSongInfo() {
-        var id = parseInt(select.value, 10);
-        var current = LEVELS.find(function (entry) { return entry.id === id; }) || LEVELS[0];
-        songInfo.textContent = 'Song: ' + current.song;
-      }
-      refreshSongInfo();
-      select.addEventListener('change', refreshSongInfo);
+      document.getElementById('gdArrowRight').addEventListener('click', function () {
+        currentIndex = (currentIndex + 1) % LEVELS.length;
+        renderLevel(currentIndex);
+      });
 
-      document.getElementById('gdLevelLoad').addEventListener('click', function () {
-        var params = new URLSearchParams(window.location.search);
-        params.set('level', select.value);
-        window.location.search = params.toString();
+      document.getElementById('gdPlayBtn').addEventListener('click', function () {
+        loadLevel(currentIndex);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') {
+          currentIndex = (currentIndex - 1 + LEVELS.length) % LEVELS.length;
+          renderLevel(currentIndex);
+          e.preventDefault();
+        } else if (e.key === 'ArrowRight') {
+          currentIndex = (currentIndex + 1) % LEVELS.length;
+          renderLevel(currentIndex);
+          e.preventDefault();
+        } else if (e.key === 'Enter') {
+          loadLevel(currentIndex);
+        }
       });
     }
 
